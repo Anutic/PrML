@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Основная тема приложения -->
+    <style name="Theme.MyCalc2" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Цвета темы -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorAccent">@color/teal_200</item>
+
+        <!-- Настройка окна -->
+        <item name="android:windowBackground">@color/white</item>
+    </style>
+
+    <!-- Тема для Splash Screen -->
+    <style name="Theme.MyCalc2.Splash" parent="Theme.SplashScreen">
+        <!-- Цвет фона для Splash -->
+        <item name="windowSplashScreenBackground">@color/white</item>
+
+        <!-- Логотип для Splash -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+
+        <!-- Тема, которая будет применена после Splash -->
+        <item name="postSplashScreenTheme">@style/Theme.MyCalc2</item>
+    </style>
+</resources>
