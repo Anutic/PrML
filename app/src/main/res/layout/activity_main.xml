@@ -209,5 +209,14 @@
             android:textColor="@color/white"
             android:layout_margin="4dp"
             android:background="@drawable/button_equal"/>
+        <Button
+            android:id="@+id/btnClearEntry"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text="C"
+            android:background="@drawable/rounded_button"
+            android:textColor="@color/white"
+            android:layout_margin="4dp" />
     </GridLayout>
 </LinearLayout>

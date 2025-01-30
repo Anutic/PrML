@@ -13,13 +13,14 @@
 
     <!-- Тема для Splash Screen -->
     <style name="Theme.MyCalc2.Splash" parent="Theme.SplashScreen">
-        <!-- Цвет фона для Splash -->
+        <!-- Цвет фона Splash -->
         <item name="windowSplashScreenBackground">@color/white</item>
 
-        <!-- Логотип для Splash -->
-        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+        <!-- Логотип -->
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/splash</item>
 
-        <!-- Тема, которая будет применена после Splash -->
+        <!-- Тема после Splash -->
         <item name="postSplashScreenTheme">@style/Theme.MyCalc2</item>
     </style>
+
 </resources>

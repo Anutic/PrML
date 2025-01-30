@@ -15,6 +15,8 @@ import com.example.mycalc2.ui.theme.MyCalc2Theme
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,6 +28,8 @@ class MainActivity : AppCompatActivity() {
     private var resultDisplayed: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -41,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         val btnDivide: Button = findViewById(R.id.btnDivide)
         val btnEqual: Button = findViewById(R.id.btnEqual)
         val btnFloat: Button = findViewById(R.id.btnFloat)
+        val btnClearEntry: Button = findViewById(R.id.btnClearEntry)
 
         val numberButtons = listOf(
             findViewById<Button>(R.id.btn0),
@@ -70,12 +75,28 @@ class MainActivity : AppCompatActivity() {
         btnFloat.setOnClickListener { appendNumber(".") }
         btnPlusMinus.setOnClickListener { toggleSign() }
         btnPercent.setOnClickListener { applyPercent() }
+        btnClearEntry.setOnClickListener { clearEntry() }
+    }
+    private fun clearEntry() {
+        currentNumber = "0"
+        tvResult.text = currentNumber
+
+        // Сбрасываем фон активной кнопки (если была выбрана операция)
+        activeOperationButton?.setBackgroundResource(R.drawable.rounded_button)
+        activeOperationButton = null
     }
 
     private fun appendNumber(number: String) {
         if (resultDisplayed) {
             currentNumber = ""
             resultDisplayed = false
+        }
+        // Ограничиваем ввод до 9 символов
+        if (currentNumber.length >= 9 && number != ".") return
+
+        // Убираем ведущий 0, если он единственный
+        if (currentNumber == "0" && number != ".") {
+            currentNumber = ""
         }
 
         if (number == "." && currentNumber.contains(".")) return
@@ -88,16 +109,35 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setOperation(op: String) {
+        // Если нет текущего и предыдущего числа, игнорируем
         if (currentNumber.isEmpty() && previousNumber.isEmpty()) return
 
-        // Если текущая операция уже выбрана, просто обновляем её
-        operation = op
+        // Если операция уже выбрана и есть два числа, выполняем её
+        if (previousNumber.isNotEmpty() && currentNumber.isNotEmpty()) {
+            val result = when (operation) {
+                "+" -> previousNumber.toDouble() + currentNumber.toDouble()
+                "-" -> previousNumber.toDouble() - currentNumber.toDouble()
+                "*" -> previousNumber.toDouble() * currentNumber.toDouble()
+                "/" -> if (currentNumber == "0") Double.NaN else previousNumber.toDouble() / currentNumber.toDouble()
+                else -> return
+            }
 
-        // Если это первая операция, запоминаем текущее число
-        if (previousNumber.isEmpty()) {
+            // Устанавливаем результат как предыдущее число
+            previousNumber = if (result.isNaN()) {
+                "Ошибка"
+            } else {
+                result.toString()
+            }
+            tvResult.text = previousNumber
+            currentNumber = ""
+        } else if (currentNumber.isNotEmpty()) {
+            // Если это первая операция, сохраняем текущее число как предыдущее
             previousNumber = currentNumber
             currentNumber = ""
         }
+
+        // Устанавливаем новую операцию
+        operation = op
 
         // Обновляем фон активной кнопки
         val operationButton = when (op) {
@@ -115,6 +155,7 @@ class MainActivity : AppCompatActivity() {
         operationButton?.setBackgroundResource(R.drawable.button_active)
         activeOperationButton = operationButton
     }
+
 
     private fun calculateResult() {
         if (currentNumber.isEmpty() || previousNumber.isEmpty() || operation == null) return
