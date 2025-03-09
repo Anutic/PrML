@@ -5,12 +5,11 @@
     android:orientation="vertical"
     android:padding="16dp"
     android:gravity="bottom"
+    android:background="@drawable/bg_bottom_sheet"
+
     android:id="@+id/rootLayout">
 
     <!-- Поле для вывода результата -->
-
-    <!-- Сетка с кнопками -->
-
     <TextView
         android:id="@+id/tvResult"
         android:layout_width="match_parent"
@@ -24,21 +23,27 @@
         android:text="0"
         android:textSize="40sp" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvHistory"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:background="#EEEEEE"
+        android:padding="8dp" />
+
     <GridLayout
         android:layout_width="match_parent"
-        android:layout_height="367dp"
+        android:layout_height="350dp"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="30dp"
-        android:columnCount="4">
+        android:layout_marginBottom="3dp"
+        android:columnCount="5">
 
-        <!-- Кнопки действий -->
-
+        <!-- Кнопки операций -->
         <Button
             android:id="@+id/btnClear"
             android:layout_width="0dp"
-            android:layout_height="36dp"
-            android:layout_row="0"
-            android:layout_column="0"
+            android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:layout_margin="4dp"
             android:background="@drawable/rounded_button"
@@ -48,7 +53,7 @@
         <Button
             android:id="@+id/btnPlusMinus"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:layout_margin="4dp"
             android:background="@drawable/rounded_button"
@@ -58,7 +63,7 @@
         <Button
             android:id="@+id/btnPercent"
             android:layout_width="0dp"
-            android:layout_height="28dp"
+            android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:layout_margin="4dp"
             android:background="@drawable/rounded_button"
@@ -66,13 +71,23 @@
             android:textColor="@color/white" />
 
         <Button
-            android:id="@+id/btnAdd"
+            android:id="@+id/btnSqrt"
             android:layout_width="0dp"
-            android:layout_height="26dp"
+            android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:layout_margin="4dp"
             android:background="@drawable/rounded_button"
-            android:text="+"
+            android:text="√"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/btnClearEntry"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:background="@drawable/rounded_button"
+            android:text="C"
             android:textColor="@color/white" />
 
         <!-- Кнопки чисел -->
@@ -114,8 +129,20 @@
             android:textColor="@color/white" />
 
         <Button
+            android:id="@+id/btnAdd"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:background="@drawable/rounded_button"
+            android:text="+"
+            android:textColor="@color/white" />
+
+
+        <!-- Кнопки операций -->
+        <Button
             android:id="@+id/btn4"
-            android:layout_width="20dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:layout_margin="4dp"
@@ -150,6 +177,18 @@
             android:text="*"
             android:textColor="@color/white" />
 
+        <Button
+            android:id="@+id/btnCos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:background="@drawable/rounded_button"
+            android:text="cos"
+            android:textColor="@color/white" />
+
+
+        <!-- Кнопки операций -->
         <Button
             android:id="@+id/btn1"
             android:layout_width="0dp"
@@ -187,12 +226,22 @@
             android:text="-"
             android:textColor="@color/white" />
 
-        <!-- Последний ряд -->
+        <!-- Кнопка для тригонометрии -->
+        <Button
+            android:id="@+id/btnSin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:background="@drawable/rounded_button"
+            android:text="sin"
+            android:textColor="@color/white" />
+
         <Button
             android:id="@+id/btn0"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_columnWeight="2"
+            android:layout_columnWeight="1"
             android:layout_margin="4dp"
             android:background="@drawable/button_number"
             android:text="0" />
@@ -217,39 +266,9 @@
             android:textColor="@color/white" />
 
         <Button
-            android:id="@+id/btnClearEntry"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:background="@drawable/rounded_button"
-            android:text="C"
-            android:textColor="@color/white" />
-
-        <Button
-            android:id="@+id/btnSin"
-            android:layout_width="0dp"
-            android:layout_height="32dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:background="@drawable/rounded_button"
-            android:text="sin"
-            android:textColor="@color/white" />
-
-        <Button
-            android:id="@+id/btnCos"
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:background="@drawable/rounded_button"
-            android:text="cos"
-            android:textColor="@color/white" />
-
-        <Button
             android:id="@+id/btnTan"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:layout_margin="4dp"
             android:background="@drawable/rounded_button"
@@ -259,7 +278,7 @@
         <Button
             android:id="@+id/btnCtg"
             android:layout_width="0dp"
-            android:layout_height="32dp"
+            android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:layout_margin="4dp"
             android:background="@drawable/rounded_button"
@@ -267,22 +286,23 @@
             android:textColor="@color/white" />
 
         <Button
-            android:id="@+id/btnSqrt"
-            android:layout_width="0dp"
-            android:layout_height="29dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:background="@drawable/rounded_button"
-            android:text="√"
-            android:textColor="@color/white" />
-        <Button
             android:id="@+id/btnCopy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Copy"
             android:layout_gravity="center_horizontal"
             android:padding="16dp"
+            android:text="Copy"
             android:textColor="@android:color/white" />
+        <Button
+            android:id="@+id/btnThemeSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Тема"
+            android:textColor="@android:color/white"
+            android:background="@drawable/rounded_button"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"/>
 
     </GridLayout>
 </LinearLayout>

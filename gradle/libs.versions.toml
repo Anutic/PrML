@@ -10,8 +10,15 @@ activityCompose = "1.8.0"
 composeBom = "2024.04.01"
 androidx-appcompat = "1.6.1"
 androidx-cardview = "1.0.0"
+gmsVersion = "4.4.2"
+bomVersion = "33.8.0"
+firebaseMessaging = "23.3.1"
 
 [libraries]
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "bomVersion" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessaging" }
+
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -33,4 +40,5 @@ androidx-cardview = { group = "androidx.cardview", name = "cardview", version.re
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+gms = {id="com.google.gms.google-services", version.ref = "gmsVersion"}
 

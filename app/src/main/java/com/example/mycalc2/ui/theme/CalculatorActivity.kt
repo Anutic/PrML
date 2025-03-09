@@ -1,5 +1,6 @@
 package com.example.mycalc2
 
+import android.app.NotificationChannel
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.Button
@@ -8,7 +9,17 @@ import kotlin.math.*
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.mycalc2.adapters.HistoryAdapter
+import com.example.mycalc2.utils.FirebaseManager
+import com.example.mycalc2.utils.CalculationUtils
+import com.example.mycalc2.ui.ThemeBottomSheetDialog
+import com.example.mycalc2.utils.ThemeManager
+import android.app.NotificationManager
+import android.os.Build
+import android.util.Log
+import com.google.firebase.messaging.FirebaseMessaging
 
 class CalculatorActivity : AppCompatActivity() {
 
@@ -21,12 +32,39 @@ class CalculatorActivity : AppCompatActivity() {
     private var resultDisplayed: Boolean = false
     private lateinit var gestureDetector: GestureDetector
 
+    private lateinit var firebaseManager: FirebaseManager
+    private lateinit var historyAdapter: HistoryAdapter
+    private val historyList = mutableListOf<Pair<String, String>>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_calculator)
 
+        createNotificationChannel()
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+            val token = task.result
+            Log.d("FCM Token", token)
+        }
+        val rootLayout = findViewById<View>(R.id.rootLayout) // Получаем корневой layout
+//        val savedColor = ThemeManager.getSavedThemeColor(this)
+//        ThemeManager.applyTheme(rootLayout, savedColor) // Устанавливаем цвет при запуске
+        ThemeManager.getSavedThemeColor(this) { color ->
+            ThemeManager.applyTheme(rootLayout, color)
+        }
+
+        val btnThemeSettings: Button = findViewById(R.id.btnThemeSettings)
+        btnThemeSettings.setOnClickListener {
+            ThemeBottomSheetDialog(rootLayout).show(supportFragmentManager, "ThemeBottomSheetDialog")
+        }
+
+        firebaseManager = FirebaseManager()
         // Блокируем ориентацию экрана при запуске
-        ApiUtils.lockScreenOrientation(this)
+//        ApiUtils.lockScreenOrientation(this)
         // Связываем элементы интерфейса
         tvResult = findViewById(R.id.tvResult)
 
@@ -95,7 +133,6 @@ class CalculatorActivity : AppCompatActivity() {
 
 
         // Назначаем слушатель свайпов на корневой layout
-        val rootLayout = findViewById<View>(R.id.rootLayout)
         rootLayout.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
             true
@@ -136,6 +173,13 @@ class CalculatorActivity : AppCompatActivity() {
         btnTan.setOnClickListener { applyFunction("tan") }
         btnCtg.setOnClickListener { applyFunction("ctg") }
         btnSqrt.setOnClickListener { applyFunction("sqrt") }
+        // История
+        val rvHistory: RecyclerView = findViewById(R.id.rvHistory)
+        historyAdapter = HistoryAdapter(historyList)
+        rvHistory.layoutManager = LinearLayoutManager(this)
+        rvHistory.adapter = historyAdapter
+
+        loadCalculationHistory()
     }
 
     // Переопределяем для обработки событий жестов
@@ -162,25 +206,59 @@ class CalculatorActivity : AppCompatActivity() {
     private fun handleSwipeDown() {
         clear()
     }
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "default_channel_id"
+            val channelName = "Default Channel"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(channelId, channelName, importance)
 
-    private fun applyFunction(func: String) {
-        if (currentNumber.isEmpty()) return
-
-        val value = currentNumber.toDoubleOrNull() ?: return
-        val result = when (func) {
-            "sin" -> sin(Math.toRadians(value))
-            "cos" -> cos(Math.toRadians(value))
-            "tan" -> tan(Math.toRadians(value))
-            "ctg" -> if (tan(Math.toRadians(value)) != 0.0) 1 / tan(Math.toRadians(value)) else Double.NaN
-            "sqrt" -> if (value >= 0) sqrt(value) else Double.NaN
-            else -> return
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
         }
+    }
+//    private fun applyFunction(func: String) {
+//        if (currentNumber.isEmpty()) return
+//
+//        val value = currentNumber.toDoubleOrNull() ?: return
+//        val result = when (func) {
+//            "sin" -> sin(Math.toRadians(value))
+//            "cos" -> cos(Math.toRadians(value))
+//            "tan" -> tan(Math.toRadians(value))
+//            "ctg" -> if (tan(Math.toRadians(value)) != 0.0) 1 / tan(Math.toRadians(value)) else Double.NaN
+//            "sqrt" -> if (value >= 0) sqrt(value) else Double.NaN
+//            else -> return
+//        }
+//
+//        tvResult.text = if (result.isNaN()) "Ошибка" else result.toString()
+//        currentNumber = result.toString()
+//        resultDisplayed = true
+//    }
+private fun applyFunction(func: String) {
+    if (currentNumber.isEmpty()) return
 
-        tvResult.text = if (result.isNaN()) "Ошибка" else result.toString()
-        currentNumber = result.toString()
+    val value = currentNumber.toDoubleOrNull() ?: return
+    val result = CalculationUtils.applyFunction(value, func)
+
+    if (result.isNotEmpty()) {
+        saveCalculationToFirebase("$func($currentNumber)", result)
+        updateHistory("$func($currentNumber)", result)
+        tvResult.text = result
+        currentNumber = result
         resultDisplayed = true
     }
+}
+    private fun saveCalculationToFirebase(expression: String, result: String) {
+        firebaseManager.saveCalculation(expression, result,
+            { println("История сохранена") },
+            { e -> println("Ошибка сохранения: $e") }
+        )
+    }
 
+    private fun updateHistory(expression: String, result: String) {
+        historyList.add(0, expression to result)
+        historyAdapter.notifyItemInserted(0)
+    }
     // Разблокируем ориентацию при выходе из активности
     override fun onDestroy() {
         super.onDestroy()
@@ -249,26 +327,65 @@ class CalculatorActivity : AppCompatActivity() {
         activeOperationButton = operationButton
     }
 
-    private fun calculateResult() {
-        if (currentNumber.isEmpty() || previousNumber.isEmpty() || operation == null) return
-
-        val result = when (operation) {
-            "+" -> previousNumber.toDouble() + currentNumber.toDouble()
-            "-" -> previousNumber.toDouble() - currentNumber.toDouble()
-            "*" -> previousNumber.toDouble() * currentNumber.toDouble()
-            "/" -> if (currentNumber == "0") Double.NaN else previousNumber.toDouble() / currentNumber.toDouble()
-            else -> return
-        }
-
-        tvResult.text = if (result.isNaN()) "Ошибка" else result.toString()
-        currentNumber = result.toString()
+//    private fun calculateResult() {
+//        if (currentNumber.isEmpty() || previousNumber.isEmpty() || operation == null) return
+//
+//        val result = when (operation) {
+//            "+" -> previousNumber.toDouble() + currentNumber.toDouble()
+//            "-" -> previousNumber.toDouble() - currentNumber.toDouble()
+//            "*" -> previousNumber.toDouble() * currentNumber.toDouble()
+//            "/" -> if (currentNumber == "0") Double.NaN else previousNumber.toDouble() / currentNumber.toDouble()
+//            else -> return
+//        }
+//
+//        tvResult.text = if (result.isNaN()) "Ошибка" else result.toString()
+//        currentNumber = result.toString()
+//        previousNumber = ""
+//        operation = null
+//        resultDisplayed = true
+//
+//        // Сбрасываем подсветку активной кнопки после вычисления
+//        activeOperationButton?.setBackgroundResource(R.drawable.rounded_button)
+//        activeOperationButton = null
+//    }
+    //2
+//private fun calculateResult() {
+//    val result = CalculationUtils.calculate(previousNumber, currentNumber, operation)
+//    if (result.isNotEmpty()) {
+//        tvResult.text = result
+//        firebaseManager.saveCalculation("$previousNumber $operation $currentNumber", result,
+//            { println("История сохранена") },
+//            { e -> println("Ошибка сохранения: $e") }
+//        )
+//        historyList.add(0, "$previousNumber $operation $currentNumber" to result)
+//        historyAdapter.notifyItemInserted(0)
+//        previousNumber = ""
+//        currentNumber = result
+//        operation = null
+//        resultDisplayed = true
+//    }
+//}
+private fun calculateResult() {
+    val result = CalculationUtils.calculate(previousNumber, currentNumber, operation)
+    if (result.isNotEmpty()) {
+        saveCalculationToFirebase("$previousNumber $operation $currentNumber", result)
+        updateHistory("$previousNumber $operation $currentNumber", result)
         previousNumber = ""
+        currentNumber = result
         operation = null
         resultDisplayed = true
+    }
+}
 
-        // Сбрасываем подсветку активной кнопки после вычисления
-        activeOperationButton?.setBackgroundResource(R.drawable.rounded_button)
-        activeOperationButton = null
+    private fun loadCalculationHistory() {
+        firebaseManager.loadCalculationHistory(
+            { history ->
+                historyList.clear()
+                historyList.addAll(history)
+                historyAdapter.notifyDataSetChanged()
+            },
+            { e -> println("Ошибка загрузки истории: $e") }
+        )
     }
 
     private fun clear() {

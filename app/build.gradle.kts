@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.gms )
 }
 
 android {
@@ -36,10 +37,16 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
 }
 
 dependencies {
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.messaging)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -60,4 +67,10 @@ dependencies {
     implementation(libs.androidx.cardview)
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("com.google.android.material:material:1.9.0")
+    implementation ("com.google.android.material:material:1.9.0") // Убедитесь, что Material Design подключен
+    implementation ("androidx.appcompat:appcompat:1.6.1")
+    implementation ("androidx.core:core-ktx:1.10.1")
+    implementation ("com.google.firebase:firebase-messaging:23.3.1")
+    implementation ("com.google.android.gms:play-services-basement:18.3.0")
+
 }
