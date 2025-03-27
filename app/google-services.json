@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "572284078208",
+    "project_id": "myapp-e543c",
+    "storage_bucket": "myapp-e543c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:572284078208:android:2886abf2756e7457fdbe65",
+        "android_client_info": {
+          "package_name": "com.example.mycalc2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyCvRQXKyLNqeKmfsh4jRyaJKHJ1MRCDA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

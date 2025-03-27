@@ -32,4 +32,5 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(this, CalculatorActivity::class.java)
         startActivity(intent)
     }
+
 }

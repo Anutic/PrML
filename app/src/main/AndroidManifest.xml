@@ -9,6 +9,10 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -17,16 +21,27 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/my_icon_foreground"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MyCalc2"
+        android:theme="@style/Theme.MyCalc2" android:allowAudioPlaybackCapture="true"
         tools:targetApi="31">
+<!--        <activity-->
+<!--            android:name=".PassKeyActivity"-->
+<!--            android:exported="true">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
+        <activity android:name=".auth.PassKeyAuthActivity"
+            android:exported="true" />
+
         <activity
-            android:name=".PassKeyActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:name=".PassKey.LoginActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".PassKey.SetupPassKeyActivity"
+            android:exported="true" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -56,6 +71,11 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="default_channel_id" />
+
+        <meta-data
+            android:name="com.google.android.gms.auth.api.credentials.provider"
+            android:value="true"/>
+
 
     </application>
 
